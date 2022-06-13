@@ -27,7 +27,7 @@ RUN python3 -m pip install --no-cache-dir -e ./transformers[dev,onnxruntime]
 # TODO: Handle these in a python utility script
 RUN [ ${#PYTORCH} -gt 0 -a "$PYTORCH" != "pre" ] && VERSION='torch=='$PYTORCH'.*' ||  VERSION='torch'; echo "export VERSION='$VERSION'" >> ~/.profile
 RUN echo torch=$VERSION
-RUN [ ${#PYTORCH} != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION --extra-index-url https://download.pytorch.org/whl/$CUDA || python3 -m pip install --no-cache-dir -U --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/$CUDA
+RUN [ "$PYTORCH" != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION --extra-index-url https://download.pytorch.org/whl/$CUDA || python3 -m pip install --no-cache-dir -U --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/$CUDA
 
 # latest `torchvision` and `torchaudio`
 # TODO: We might need to specify proper versions that work with a specific torch version (especially for past CI)
