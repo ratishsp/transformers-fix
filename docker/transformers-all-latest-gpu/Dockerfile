@@ -21,11 +21,20 @@ ARG REF=main
 RUN git clone https://github.com/huggingface/transformers && cd transformers && git checkout $REF
 RUN python3 -m pip install --no-cache-dir -e ./transformers[dev,onnxruntime]
 
-RUN python3 -m pip install --no-cache-dir -U torch==$PYTORCH torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/$CUDA
+# TODO: Handle these in a python utility script
+RUN [ ${#PYTORCH} -gt 0 -a ${#PYTORCH} != "pre" ] && VERSION='torch=='$PYTORCH'.*' ||  VERSION='torch'
+RUN [ ${#PYTORCH} != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION --extra-index-url https://download.pytorch.org/whl/$CUDA || python3 -m pip install --no-cache-dir -U --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/$CUDA
+
+# latest `torchvision` and `torchaudio`
+# TODO: We might need to specify proper versions that work with a specific torch version (especially for past CI)
+RUN python3 -m pip install --no-cache-dir -U torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/$CUDA
+
 RUN python3 -m pip install --no-cache-dir -U tensorflow
 RUN python3 -m pip uninstall -y flax jax
 
-RUN python3 -m pip install --no-cache-dir torch-scatter -f https://data.pyg.org/whl/torch-$PYTORCH+$CUDA.html
+# Use installed torch version for `torch-scatter` to avid to deal with PYTORCH='pre'.
+# If torch is nightly version, the link is likely to be invalid, but the installation falls back to the latest torch-scatter
+RUN python3 -m pip install --no-cache-dir torch-scatter -f https://data.pyg.org/whl/torch-$(python3 -c "from torch import version; print(version.__version__.split('+')[0])")+$CUDA.html
 RUN python3 -m pip install --no-cache-dir intel_extension_for_pytorch==$INTEL_TORCH_EXT+cpu -f https://software.intel.com/ipex-whl-stable
 
 RUN python3 -m pip install --no-cache-dir git+https://github.com/facebookresearch/detectron2.git pytesseract https://github.com/kpu/kenlm/archive/master.zip
