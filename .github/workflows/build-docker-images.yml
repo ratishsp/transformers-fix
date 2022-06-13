@@ -3,7 +3,7 @@ name: Build docker images (scheduled)
 on:
   push:
     branches:
-      - test_enable_pytorch_nightly_ci
+      - test_enable_pytorch_nightly_ci_none
   repository_dispatch:
   schedule:
     - cron: "0 1 * * *"
