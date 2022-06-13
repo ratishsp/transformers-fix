@@ -27,11 +27,10 @@ RUN python3 -m pip install --no-cache-dir -e ./transformers[dev,onnxruntime]
 # TODO: Handle these in a python utility script
 RUN [ ${#PYTORCH} -gt 0 -a "$PYTORCH" != "pre" ] && VERSION='torch=='$PYTORCH'.*' ||  VERSION='torch'; echo "export VERSION='$VERSION'" >> ~/.profile
 RUN echo torch=$VERSION
-RUN [ "$PYTORCH" != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION --extra-index-url https://download.pytorch.org/whl/$CUDA || python3 -m pip install --no-cache-dir -U --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/$CUDA
-
-# latest `torchvision` and `torchaudio`
-# TODO: We might need to specify proper versions that work with a specific torch version (especially for past CI)
-RUN python3 -m pip install --no-cache-dir -U torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/$CUDA
+# `torchvision` and `torchaudio` should be installed along with `torch`, especially for nightly build.
+# Currently, let's just use their latest releases (when `torch` is installed with a release version)
+# TODO: We might need to specify proper versions that work with a specific torch version (especially for past CI).
+RUN [ "$PYTORCH" != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/$CUDA || python3 -m pip install --no-cache-dir -U --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/$CUDA
 
 RUN python3 -m pip install --no-cache-dir -U tensorflow
 RUN python3 -m pip uninstall -y flax jax
