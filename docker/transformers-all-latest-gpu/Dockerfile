@@ -3,7 +3,7 @@ LABEL maintainer="Hugging Face"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Used to read variables from `~/.profile` (to pass dynamic created variables between RUN commands)
+# Use login shell to read variables from `~/.profile` (to pass dynamic created variables between RUN commands)
 SHELL ["sh", "-lc"]
 
 # The following `ARG` are mainly used to specify the versions explicitly & directly in this docker file, and not meant
