@@ -423,13 +423,6 @@ def main():
     )
 
     model.resize_token_embeddings(len(tokenizer))
-    import torch
-    from transformers.modeling_utils import _load_state_dict_into_model
-
-    d = model.state_dict()
-    d["led.decoder.embed_tokens.weight"][0] = d["led.decoder.embed_tokens.weight"][0] + torch.randn(1024)
-
-    _load_state_dict_into_model(model, d, "led.")
 
     if model.config.decoder_start_token_id is None and isinstance(tokenizer, (MBartTokenizer, MBartTokenizerFast)):
         if isinstance(tokenizer, MBartTokenizer):
